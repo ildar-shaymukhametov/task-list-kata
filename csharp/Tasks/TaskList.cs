@@ -4,7 +4,28 @@ using System.Linq;
 
 namespace Tasks
 {
-	public sealed class TaskList
+    public interface ICommandLine
+    {
+        string Command { get; }
+        string[] Args { get; }
+    }
+
+    public class CommandLine : ICommandLine
+    {
+        public string Command { get; }
+        public string[] Args { get; }
+
+        public CommandLine(string command)
+        {
+            var arr = command.Split(" ".ToCharArray(), 2);
+            Command = arr[0];
+            Args = arr.Length == 2
+                ? arr[1].Split(" ")
+                : Array.Empty<string>();
+        }
+    }
+
+    public sealed class TaskList
 	{
 		private const string QUIT = "quit";
 
@@ -31,32 +52,31 @@ namespace Tasks
 				if (command == QUIT) {
 					break;
 				}
-				Execute(command);
+                Execute(new CommandLine(command));
 			}
 		}
 
-		private void Execute(string commandLine)
+        private void Execute(ICommandLine commandLine)
 		{
-			var commandRest = commandLine.Split(" ".ToCharArray(), 2);
-			var command = commandRest[0];
-			switch (command) {
+            switch (commandLine.Command)
+            {
 			case "show":
 				Show();
 				break;
 			case "add":
-				Add(commandRest[1]);
+                    Add(commandLine);
 				break;
 			case "check":
-				Check(commandRest[1]);
+                    Check(commandLine);
 				break;
 			case "uncheck":
-				Uncheck(commandRest[1]);
+                    Uncheck(commandLine);
 				break;
 			case "help":
 				Help();
 				break;
 			default:
-				Error(command);
+                    Error(commandLine);
 				break;
 			}
 		}
@@ -72,15 +92,13 @@ namespace Tasks
 			}
 		}
 
-		private void Add(string commandLine)
+        private void Add(ICommandLine commandLine)
 		{
-			var subcommandRest = commandLine.Split(" ".ToCharArray(), 2);
-			var subcommand = subcommandRest[0];
+            var subcommand = commandLine.Args[0];
 			if (subcommand == "project") {
-				AddProject(subcommandRest[1]);
+                AddProject(commandLine.Args[1]);
 			} else if (subcommand == "task") {
-				var projectTask = subcommandRest[1].Split(" ".ToCharArray(), 2);
-				AddTask(projectTask[0], projectTask[1]);
+                AddTask(commandLine.Args[1], string.Join(" ", commandLine.Args.Skip(2)));
 			}
 		}
 
@@ -99,14 +117,14 @@ namespace Tasks
 			projectTasks.Add(new Task { Id = NextId(), Description = description, Done = false });
 		}
 
-		private void Check(string idString)
+        private void Check(ICommandLine commandLine)
 		{
-			SetDone(idString, true);
+            SetDone(commandLine.Args[0], true);
 		}
 
-		private void Uncheck(string idString)
+        private void Uncheck(ICommandLine commandLine)
 		{
-			SetDone(idString, false);
+            SetDone(commandLine.Args[0], false);
 		}
 
 		private void SetDone(string idString, bool done)
@@ -135,9 +153,9 @@ namespace Tasks
 			console.WriteLine();
 		}
 
-		private void Error(string command)
+        private void Error(ICommandLine commandLine)
 		{
-			console.WriteLine("I don't know what the command \"{0}\" is.", command);
+            console.WriteLine("I don't know what the command \"{0}\" is.", commandLine.Command);
 		}
 
 		private long NextId()
