@@ -25,11 +25,23 @@ namespace Tasks
         }
     }
 
+    public class Project
+    {
+        public List<Task> Tasks { get; }
+        public string Name { get; }
+	
+        public Project(string name)
+        {
+            Name = name;
+            Tasks = new List<Task>();
+        }
+    }
+
     public sealed class TaskList
 	{
 		private const string QUIT = "quit";
 
-		private readonly IDictionary<string, IList<Task>> tasks = new Dictionary<string, IList<Task>>();
+        private readonly List<Project> projects;
 		private readonly IConsole console;
 
 		private long lastId = 0;
@@ -42,6 +54,7 @@ namespace Tasks
 		public TaskList(IConsole console)
 		{
 			this.console = console;
+            this.projects = new List<Project>();
 		}
 
 		public void Run()
@@ -83,9 +96,11 @@ namespace Tasks
 
 		private void Show()
 		{
-			foreach (var project in tasks) {
-				console.WriteLine(project.Key);
-				foreach (var task in project.Value) {
+            foreach (var project in projects)
+            {
+                console.WriteLine(project.Name);
+                foreach (var task in project.Tasks)
+                {
 					console.WriteLine("    [{0}] {1}: {2}", (task.Done ? 'x' : ' '), task.Id, task.Description);
 				}
 				console.WriteLine();
@@ -98,23 +113,22 @@ namespace Tasks
 			if (subcommand == "project") {
                 AddProject(commandLine.Args[1]);
 			} else if (subcommand == "task") {
-                AddTask(commandLine.Args[1], string.Join(" ", commandLine.Args.Skip(2)));
+                var projectName = commandLine.Args[1];
+                var project = projects.Find(x => x.Name == projectName);
+                if (project == null)
+                {
+                    Console.WriteLine("Could not find a project with the name \"{0}\".", projectName);
+                    return;
+                }
+
+                var description = string.Join(" ", commandLine.Args.Skip(2));
+                project.Tasks.Add(new Task { Id = NextId(), Description = description, Done = false });
 			}
 		}
 
 		private void AddProject(string name)
 		{
-			tasks[name] = new List<Task>();
-		}
-
-		private void AddTask(string project, string description)
-		{
-			if (!tasks.TryGetValue(project, out IList<Task> projectTasks))
-			{
-				Console.WriteLine("Could not find a project with the name \"{0}\".", project);
-				return;
-			}
-			projectTasks.Add(new Task { Id = NextId(), Description = description, Done = false });
+            projects.Add(new Project(name));
 		}
 
         private void Check(ICommandLine commandLine)
@@ -130,10 +144,9 @@ namespace Tasks
 		private void SetDone(string idString, bool done)
 		{
 			int id = int.Parse(idString);
-			var identifiedTask = tasks
-				.Select(project => project.Value.FirstOrDefault(task => task.Id == id))
-				.Where(task => task != null)
-				.FirstOrDefault();
+            var identifiedTask = projects
+                .SelectMany(project => project.Tasks)
+                .FirstOrDefault(task => task.Id == id);
 			if (identifiedTask == null) {
 				console.WriteLine("Could not find a task with an ID of {0}.", id);
 				return;
