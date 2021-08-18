@@ -37,14 +37,28 @@ namespace Tasks
         }
     }
 
+    public class Id
+    {
+        private static long lastId;
+        public Id(string value)
+        {
+            Value = long.Parse(value);
+        }
+
+        public long Value { get; }
+
+        public static long GetNextId()
+        {
+            return ++lastId;
+        }
+    }
+
     public sealed class TaskList
 	{
 		private const string QUIT = "quit";
 
         private readonly List<Project> projects;
 		private readonly IConsole console;
-
-		private long lastId = 0;
 
 		public static void Main(string[] args)
 		{
@@ -122,26 +136,25 @@ namespace Tasks
                 }
 
                 var description = string.Join(" ", commandLine.Args.Skip(2));
-                project.Tasks.Add(new Task { Id = NextId(), Description = description, Done = false });
+                project.Tasks.Add(new Task { Id = Id.GetNextId(), Description = description, Done = false });
 			}
 		}
 
         private void Check(ICommandLine commandLine)
 		{
-            SetDone(commandLine.Args[0], true);
+            SetDone(new Id(commandLine.Args[0]), true);
 		}
 
         private void Uncheck(ICommandLine commandLine)
 		{
-            SetDone(commandLine.Args[0], false);
+            SetDone(new Id(commandLine.Args[0]), false);
 		}
 
-		private void SetDone(string idString, bool done)
-		{
-			int id = int.Parse(idString);
+        private void SetDone(Id id, bool done)
+        {
             var identifiedTask = projects
                 .SelectMany(project => project.Tasks)
-                .FirstOrDefault(task => task.Id == id);
+                .FirstOrDefault(task => task.Id == id.Value);
 			if (identifiedTask == null) {
 				console.WriteLine("Could not find a task with an ID of {0}.", id);
 				return;
@@ -164,11 +177,6 @@ namespace Tasks
         private void Error(ICommandLine commandLine)
 		{
             console.WriteLine("I don't know what the command \"{0}\" is.", commandLine.Command);
-		}
-
-		private long NextId()
-		{
-			return ++lastId;
-		}
+        }
 	}
 }
