@@ -2,6 +2,12 @@ using System;
 
 namespace Tasks
 {
+    public interface ICommandLine
+    {
+        string Command { get; }
+        string[] Args { get; }
+    }
+
     public class CommandLine : ICommandLine
     {
         public string Command { get; }

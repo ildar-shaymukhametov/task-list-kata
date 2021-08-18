@@ -4,12 +4,6 @@ using System.Linq;
 
 namespace Tasks
 {
-    public interface ICommandLine
-    {
-        string Command { get; }
-        string[] Args { get; }
-    }
-
     public sealed class TaskList
     {
         private readonly List<Project> projects;
