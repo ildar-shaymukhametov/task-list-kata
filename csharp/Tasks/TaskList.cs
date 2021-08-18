@@ -110,10 +110,10 @@ namespace Tasks
         private void Add(ICommandLine commandLine)
 		{
             var subcommand = commandLine.Args[0];
+			var projectName = commandLine.Args[1];
 			if (subcommand == "project") {
-                AddProject(commandLine.Args[1]);
+            	projects.Add(new Project(projectName));
 			} else if (subcommand == "task") {
-                var projectName = commandLine.Args[1];
                 var project = projects.Find(x => x.Name == projectName);
                 if (project == null)
                 {
@@ -124,11 +124,6 @@ namespace Tasks
                 var description = string.Join(" ", commandLine.Args.Skip(2));
                 project.Tasks.Add(new Task { Id = NextId(), Description = description, Done = false });
 			}
-		}
-
-		private void AddProject(string name)
-		{
-            projects.Add(new Project(name));
 		}
 
         private void Check(ICommandLine commandLine)
