@@ -178,11 +178,60 @@ namespace Tasks
         }
     }
 
+    public class QuitCommand : ICommand
+    {
+        public void Execute()
+        {
+        }
+    }
+
+    public class CommandFactory
+    {
+        private readonly List<Project> projects;
+        private readonly IConsole console;
+
+        public CommandFactory(List<Project> projects, IConsole console)
+        {
+            this.projects = projects;
+            this.console = console;
+        }
+
+        public ICommand Create(ICommandLine commandLine)
+        {
+            ICommand result = null;
+            switch (commandLine.Command)
+            {
+                case "show":
+                    result = new ShowCommand(console, projects);
+                    break;
+                case "add":
+                    result = new AddCommand(commandLine, projects);
+                    break;
+                case "check":
+                    result = new CheckCommand(commandLine, projects, console);
+                    break;
+                case "uncheck":
+                    result = new UncheckCommand(commandLine, projects, console);
+                    break;
+                case "help":
+                    result = new HelpCommand(console);
+                    break;
+                case "quit":
+                    result = new QuitCommand();
+                    break;
+                default:
+                    result = new ErrorCommand(commandLine, console);
+                    break;
+            }
+
+            return result;
+        }
+    }
+
     public sealed class TaskList
     {
-        private const string QUIT = "quit";
-
         private readonly List<Project> projects;
+        private readonly CommandFactory factory;
         private readonly IConsole console;
 
         public static void Main(string[] args)
@@ -194,45 +243,18 @@ namespace Tasks
         {
             this.console = console;
             this.projects = new List<Project>();
+            this.factory = new CommandFactory(projects, console);
         }
 
         public void Run()
         {
-            while (true)
+            ICommand command = null;
+            while (command is not QuitCommand)
             {
                 console.Write("> ");
-                var command = console.ReadLine();
-                if (command == QUIT)
-                {
-                    break;
-                }
-                Execute(new CommandLine(command));
+                command = factory.Create(new CommandLine(console.ReadLine()));
+                command.Execute();
             }
         }
-
-        private void Execute(ICommandLine commandLine)
-        {
-            switch (commandLine.Command)
-            {
-                case "show":
-                    new ShowCommand(console, projects).Execute();
-                    break;
-                case "add":
-                    new AddCommand(commandLine, projects).Execute();
-                    break;
-                case "check":
-                    new CheckCommand(commandLine, projects, console).Execute();
-                    break;
-                case "uncheck":
-                    new UncheckCommand(commandLine, projects, console).Execute();
-                    break;
-                case "help":
-                    new HelpCommand(console).Execute();
-                    break;
-                default:
-                    new ErrorCommand(commandLine, console).Execute();
-                    break;
-            }
-		}
 	}
 }
