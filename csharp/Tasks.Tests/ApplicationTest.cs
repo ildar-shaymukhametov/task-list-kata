@@ -42,15 +42,25 @@ namespace Tasks
 			Execute("add task secrets Eat more donuts.");
 			Execute("add task secrets Destroy all humans.");
 
+            Execute("check 1");
 			Execute("show");
 			ReadLines(
 				"secrets",
-				"    [ ] 1: Eat more donuts.",
+				"    [x] 1: Eat more donuts.",
 				"    [ ] 2: Destroy all humans.",
 				""
 			);
 
-			Execute("add project training");
+            Execute("uncheck 1");
+            Execute("show");
+            ReadLines(
+                "secrets",
+                "    [ ] 1: Eat more donuts.",
+                "    [ ] 2: Destroy all humans.",
+                ""
+            );
+
+            Execute("add project training");
 			Execute("add task training Four Elements of Simple Design");
 			Execute("add task training SOLID");
 			Execute("add task training Coupling and Cohesion");
