@@ -10,49 +10,6 @@ namespace Tasks
         string[] Args { get; }
     }
 
-    public class CommandLine : ICommandLine
-    {
-        public string Command { get; }
-        public string[] Args { get; }
-
-        public CommandLine(string command)
-        {
-            var arr = command.Split(" ".ToCharArray(), 2);
-            Command = arr[0];
-            Args = arr.Length == 2
-                ? arr[1].Split(" ")
-                : Array.Empty<string>();
-        }
-    }
-
-    public class Project
-    {
-        public List<Task> Tasks { get; }
-        public string Name { get; }
-	
-        public Project(string name)
-        {
-            Name = name;
-            Tasks = new List<Task>();
-        }
-    }
-
-    public class Id
-    {
-        private static long lastId;
-        public Id(string value)
-        {
-            Value = long.Parse(value);
-        }
-
-        public long Value { get; }
-
-        public static long GetNextId()
-        {
-            return ++lastId;
-        }
-    }
-
     public sealed class TaskList
 	{
 		private const string QUIT = "quit";
