@@ -34,12 +34,12 @@ namespace Tasks
         }
     }
 
-    public class AddCommand : ICommand
+    public class AddProjectCommand : ICommand
     {
         private readonly ICommandLine commandLine;
         private readonly List<Project> projects;
 
-        public AddCommand(ICommandLine commandLine, List<Project> projects)
+        public AddProjectCommand(ICommandLine commandLine, List<Project> projects)
         {
             this.commandLine = commandLine;
             this.projects = projects;
@@ -47,24 +47,34 @@ namespace Tasks
 
         public void Execute()
         {
-            var subcommand = commandLine.Args[0];
             var projectName = commandLine.Args[1];
-            if (subcommand == "project")
-            {
-                projects.Add(new Project(projectName));
-            }
-            else if (subcommand == "task")
-            {
-                var project = projects.Find(x => x.Name == projectName);
-                if (project == null)
-                {
-                    Console.WriteLine("Could not find a project with the name \"{0}\".", projectName);
-                    return;
-                }
+            projects.Add(new Project(projectName));
+        }
+    }
 
-                var description = string.Join(" ", commandLine.Args.Skip(2));
-                project.Tasks.Add(new Task { Id = Id.GetNextId(), Description = description, Done = false });
+    public class AddTaskCommand : ICommand
+    {
+        private readonly ICommandLine commandLine;
+        private readonly List<Project> projects;
+
+        public AddTaskCommand(ICommandLine commandLine, List<Project> projects)
+        {
+            this.commandLine = commandLine;
+            this.projects = projects;
+        }
+
+        public void Execute()
+        {
+            var projectName = commandLine.Args[1];
+            var project = projects.Find(x => x.Name == projectName);
+            if (project == null)
+            {
+                Console.WriteLine("Could not find a project with the name \"{0}\".", projectName);
+                return;
             }
+
+            var description = string.Join(" ", commandLine.Args.Skip(2));
+            project.Tasks.Add(new Task { Id = Id.GetNextId(), Description = description, Done = false });
         }
     }
 
@@ -198,8 +208,11 @@ namespace Tasks
                 case "show":
                     result = new ShowCommand(console, projects);
                     break;
-                case "add":
-                    result = new AddCommand(commandLine, projects);
+                case "add" when commandLine.Args[0] == "task":
+                    result = new AddTaskCommand(commandLine, projects);
+                    break;
+                case "add" when commandLine.Args[0] == "project":
+                    result = new AddProjectCommand(commandLine, projects);
                     break;
                 case "check":
                     result = new CheckCommand(commandLine, projects, console);
