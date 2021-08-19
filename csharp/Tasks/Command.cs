@@ -36,10 +36,10 @@ namespace Tasks
 
     public class AddProjectCommand : ICommand
     {
-        private readonly ICommandLine commandLine;
+        private readonly AddProjectCommandLine commandLine;
         private readonly List<Project> projects;
 
-        public AddProjectCommand(ICommandLine commandLine, List<Project> projects)
+        public AddProjectCommand(AddProjectCommandLine commandLine, List<Project> projects)
         {
             this.commandLine = commandLine;
             this.projects = projects;
@@ -47,17 +47,16 @@ namespace Tasks
 
         public void Execute()
         {
-            var projectName = commandLine.Args[1];
-            projects.Add(new Project(projectName));
+            projects.Add(new Project(commandLine.Project));
         }
     }
 
     public class AddTaskCommand : ICommand
     {
-        private readonly ICommandLine commandLine;
+        private readonly AddTaskCommandLine commandLine;
         private readonly List<Project> projects;
 
-        public AddTaskCommand(ICommandLine commandLine, List<Project> projects)
+        public AddTaskCommand(AddTaskCommandLine commandLine, List<Project> projects)
         {
             this.commandLine = commandLine;
             this.projects = projects;
@@ -65,26 +64,24 @@ namespace Tasks
 
         public void Execute()
         {
-            var projectName = commandLine.Args[1];
-            var project = projects.Find(x => x.Name == projectName);
+            var project = projects.Find(x => x.Name == commandLine.Project);
             if (project == null)
             {
-                Console.WriteLine("Could not find a project with the name \"{0}\".", projectName);
+                Console.WriteLine("Could not find a project with the name \"{0}\".", commandLine.Project);
                 return;
             }
 
-            var description = string.Join(" ", commandLine.Args.Skip(2));
-            project.Tasks.Add(new Task { Id = Id.GetNextId(), Description = description, Done = false });
+            project.Tasks.Add(new Task { Id = Id.GetNextId(), Description = commandLine.Description, Done = false });
         }
     }
 
     public class CheckCommand : ICommand
     {
-        private readonly ICommandLine commandLine;
+        private readonly CheckCommandLine commandLine;
         private readonly List<Project> projects;
         private readonly IConsole console;
 
-        public CheckCommand(ICommandLine commandLine, List<Project> projects, IConsole console)
+        public CheckCommand(CheckCommandLine commandLine, List<Project> projects, IConsole console)
         {
             this.commandLine = commandLine;
             this.projects = projects;
@@ -93,7 +90,7 @@ namespace Tasks
 
         public void Execute()
         {
-            SetDone(new Id(commandLine.Args[0]), true);
+            SetDone(commandLine.Id, true);
         }
 
         private void SetDone(Id id, bool done)
@@ -113,11 +110,11 @@ namespace Tasks
 
     public class UncheckCommand : ICommand
     {
-        private readonly ICommandLine commandLine;
+        private readonly CheckCommandLine commandLine;
         private readonly List<Project> projects;
         private readonly IConsole console;
 
-        public UncheckCommand(ICommandLine commandLine, List<Project> projects, IConsole console)
+        public UncheckCommand(CheckCommandLine commandLine, List<Project> projects, IConsole console)
         {
             this.commandLine = commandLine;
             this.projects = projects;
@@ -126,7 +123,7 @@ namespace Tasks
 
         public void Execute()
         {
-            SetDone(new Id(commandLine.Args[0]), false);
+            SetDone(commandLine.Id, false);
         }
 
         private void SetDone(Id id, bool done)
@@ -178,7 +175,7 @@ namespace Tasks
 
         public void Execute()
         {
-            console.WriteLine("I don't know what the command \"{0}\" is.", commandLine.Command);
+            console.WriteLine("I don't know what the command \"{0}\" is.", commandLine.Arg);
         }
     }
 
@@ -200,35 +197,40 @@ namespace Tasks
             this.console = console;
         }
 
-        public ICommand Create(ICommandLine commandLine)
+        public ICommand Create(string arg)
         {
             ICommand result = null;
-            switch (commandLine.Command)
+            if (arg.StartsWith("show"))
             {
-                case "show":
-                    result = new ShowCommand(console, projects);
-                    break;
-                case "add" when commandLine.Args[0] == "task":
-                    result = new AddTaskCommand(commandLine, projects);
-                    break;
-                case "add" when commandLine.Args[0] == "project":
-                    result = new AddProjectCommand(commandLine, projects);
-                    break;
-                case "check":
-                    result = new CheckCommand(commandLine, projects, console);
-                    break;
-                case "uncheck":
-                    result = new UncheckCommand(commandLine, projects, console);
-                    break;
-                case "help":
-                    result = new HelpCommand(console);
-                    break;
-                case "quit":
-                    result = new QuitCommand();
-                    break;
-                default:
-                    result = new ErrorCommand(commandLine, console);
-                    break;
+                result = new ShowCommand(console, projects);
+            }
+            else if (arg.StartsWith("add task"))
+            {
+                result = new AddTaskCommand(new AddTaskCommandLine(arg), projects);
+            }
+            else if (arg.StartsWith("add project"))
+            {
+                result = new AddProjectCommand(new AddProjectCommandLine(arg), projects);
+            }
+            else if (arg.StartsWith("check"))
+            {
+                result = new CheckCommand(new CheckCommandLine(arg), projects, console);
+            }
+            else if (arg.StartsWith("uncheck"))
+            {
+                result = new UncheckCommand(new CheckCommandLine(arg), projects, console);
+            }
+            else if (arg.StartsWith("help"))
+            {
+                result = new HelpCommand(console);
+            }
+            else if (arg.StartsWith("quit"))
+            {
+                result = new QuitCommand();
+            }
+            else
+            {
+                result = new ErrorCommand(new CommandLine(arg), console);
             }
 
             return result;

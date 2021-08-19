@@ -28,7 +28,7 @@ namespace Tasks
             while (command is not QuitCommand)
             {
                 console.Write("> ");
-                command = factory.Create(new CommandLine(console.ReadLine()));
+                command = factory.Create(console.ReadLine());
                 command.Execute();
             }
         }
