@@ -186,15 +186,65 @@ namespace Tasks
         }
     }
 
+    public class DeadlineCommand : ICommand
+    {
+        private readonly DeadlineCommandLine commandLine;
+        private readonly List<Project> projects;
+
+        public DeadlineCommand(DeadlineCommandLine commandLine, List<Project> projects)
+        {
+            this.commandLine = commandLine;
+            this.projects = projects;
+        }
+
+        public void Execute()
+        {
+            var task = projects.SelectMany(x => x.Tasks).FirstOrDefault(x => x.Id == commandLine.Id.Value);
+            if (task == null)
+            {
+                Console.WriteLine("Could not find a task with the id \"{0}\".", commandLine.Id.Value);
+                return;
+            }
+
+            task.Deadline = commandLine.Deadline;
+        }
+    }
+
+    public class TodayCommand : ICommand
+    {
+        private readonly IConsole console;
+        private readonly List<Project> projects;
+        private readonly DateTime today;
+
+        public TodayCommand(IConsole console, List<Project> projects, DateTime today)
+        {
+            this.console = console;
+            this.projects = projects;
+            this.today = today;
+        }
+
+        public void Execute()
+        {
+            projects
+                .SelectMany(x => x.Tasks)
+                .Where(x => x.Deadline == today)
+                .ToList()
+                .ForEach(x => console.WriteLine(x.Description));
+            console.WriteLine();
+        }
+    }
+
     public class CommandFactory
     {
         private readonly List<Project> projects;
         private readonly IConsole console;
+        private readonly DateTime today;
 
-        public CommandFactory(List<Project> projects, IConsole console)
+        public CommandFactory(List<Project> projects, IConsole console, DateTime today)
         {
             this.projects = projects;
             this.console = console;
+            this.today = today;
         }
 
         public ICommand Create(string arg)
@@ -223,6 +273,14 @@ namespace Tasks
             else if (arg.StartsWith("help"))
             {
                 result = new HelpCommand(console);
+            }
+            else if (arg.StartsWith("deadline"))
+            {
+                result = new DeadlineCommand(new DeadlineCommandLine(arg), projects);
+            }
+            else if (arg.StartsWith("today"))
+            {
+                result = new TodayCommand(console, projects, today);
             }
             else if (arg.StartsWith("quit"))
             {

@@ -16,7 +16,7 @@ namespace Tasks
 		public void StartTheApplication()
 		{
 			this.console = new FakeConsole();
-			var taskList = new TaskList(console);
+			var taskList = new TaskList(console, new DateTime(2020, 10, 10));
 			this.applicationThread = new System.Threading.Thread(() => taskList.Run());
 			applicationThread.Start();
 		}
@@ -88,6 +88,16 @@ namespace Tasks
 				"    [ ] 8: Interaction-Driven Design",
 				""
 			);
+
+            Execute("deadline 1 10.10.2020");
+            Execute("deadline 2 10.10.2020");
+            Execute("deadline 3 11.10.2020");
+            Execute("today");
+            ReadLines(
+                "Eat more donuts.",
+                "Destroy all humans.",
+                ""
+            );
 
 			Execute("quit");
 		}

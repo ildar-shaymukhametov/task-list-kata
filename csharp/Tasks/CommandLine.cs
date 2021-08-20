@@ -51,4 +51,17 @@ namespace Tasks
             Id = new Id(args[1]);
         }
     }
+
+    public class DeadlineCommandLine : CommandLine
+    {
+        public Id Id { get; }
+        public DateTime Deadline { get; }
+
+        public DeadlineCommandLine(string arg) : base(arg)
+        {
+            var args = arg.Split(" ");
+            Id = new Id(args[1]);
+            Deadline = DateTime.Parse(args[2]);
+        }
+    }
 }

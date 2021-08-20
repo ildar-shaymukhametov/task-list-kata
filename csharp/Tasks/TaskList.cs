@@ -12,14 +12,14 @@ namespace Tasks
 
         public static void Main(string[] args)
         {
-            new TaskList(new RealConsole()).Run();
+            new TaskList(new RealConsole(), DateTime.Now).Run();
         }
 
-        public TaskList(IConsole console)
+        public TaskList(IConsole console, DateTime today)
         {
             this.console = console;
             this.projects = new List<Project>();
-            this.factory = new CommandFactory(projects, console);
+            this.factory = new CommandFactory(projects, console, today);
         }
 
         public void Run()
