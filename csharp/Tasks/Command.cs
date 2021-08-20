@@ -97,7 +97,7 @@ namespace Tasks
         {
             var identifiedTask = projects
                 .SelectMany(project => project.Tasks)
-                .FirstOrDefault(task => task.Id == id.Value);
+                .FirstOrDefault(task => task.Id == id);
             if (identifiedTask == null)
             {
                 console.WriteLine("Could not find a task with an ID of {0}.", id);
@@ -130,7 +130,7 @@ namespace Tasks
         {
             var identifiedTask = projects
                 .SelectMany(project => project.Tasks)
-                .FirstOrDefault(task => task.Id == id.Value);
+                .FirstOrDefault(task => task.Id == id);
             if (identifiedTask == null)
             {
                 console.WriteLine("Could not find a task with an ID of {0}.", id);
@@ -199,10 +199,10 @@ namespace Tasks
 
         public void Execute()
         {
-            var task = projects.SelectMany(x => x.Tasks).FirstOrDefault(x => x.Id == commandLine.Id.Value);
+            var task = projects.SelectMany(x => x.Tasks).FirstOrDefault(x => x.Id == commandLine.Id);
             if (task == null)
             {
-                Console.WriteLine("Could not find a task with the id \"{0}\".", commandLine.Id.Value);
+                Console.WriteLine("Could not find a task with the id \"{0}\".", commandLine.Id);
                 return;
             }
 
