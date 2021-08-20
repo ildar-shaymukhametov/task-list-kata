@@ -6,7 +6,7 @@ namespace Tasks
 {
     public sealed class TaskList
     {
-        private readonly List<Project> projects;
+        private readonly Projects projects;
         private readonly CommandFactory factory;
         private readonly IConsole console;
 
@@ -18,8 +18,8 @@ namespace Tasks
         public TaskList(IConsole console, DateTime today)
         {
             this.console = console;
-            this.projects = new List<Project>();
-            this.factory = new CommandFactory(projects, console, today);
+            this.projects = new Projects(today);
+            this.factory = new CommandFactory(projects, console);
         }
 
         public void Run()

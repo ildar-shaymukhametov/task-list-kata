@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Tasks
 {
@@ -12,9 +10,9 @@ namespace Tasks
     public class ShowCommand : ICommand
     {
         private readonly IConsole console;
-        private readonly List<Project> projects;
+        private readonly Projects projects;
 
-        public ShowCommand(IConsole console, List<Project> projects)
+        public ShowCommand(IConsole console, Projects projects)
         {
             this.console = console;
             this.projects = projects;
@@ -37,9 +35,9 @@ namespace Tasks
     public class AddProjectCommand : ICommand
     {
         private readonly AddProjectCommandLine commandLine;
-        private readonly List<Project> projects;
+        private readonly Projects projects;
 
-        public AddProjectCommand(AddProjectCommandLine commandLine, List<Project> projects)
+        public AddProjectCommand(AddProjectCommandLine commandLine, Projects projects)
         {
             this.commandLine = commandLine;
             this.projects = projects;
@@ -54,9 +52,9 @@ namespace Tasks
     public class AddTaskCommand : ICommand
     {
         private readonly AddTaskCommandLine commandLine;
-        private readonly List<Project> projects;
+        private readonly Projects projects;
 
-        public AddTaskCommand(AddTaskCommandLine commandLine, List<Project> projects)
+        public AddTaskCommand(AddTaskCommandLine commandLine, Projects projects)
         {
             this.commandLine = commandLine;
             this.projects = projects;
@@ -64,7 +62,7 @@ namespace Tasks
 
         public void Execute()
         {
-            var project = projects.Find(x => x.Name == commandLine.Project);
+            var project = projects.Find(commandLine.Project);
             if (project == null)
             {
                 Console.WriteLine("Could not find a project with the name \"{0}\".", commandLine.Project);
@@ -78,10 +76,10 @@ namespace Tasks
     public class CheckCommand : ICommand
     {
         private readonly CheckCommandLine commandLine;
-        private readonly List<Project> projects;
+        private readonly Projects projects;
         private readonly IConsole console;
 
-        public CheckCommand(CheckCommandLine commandLine, List<Project> projects, IConsole console)
+        public CheckCommand(CheckCommandLine commandLine, Projects projects, IConsole console)
         {
             this.commandLine = commandLine;
             this.projects = projects;
@@ -95,9 +93,7 @@ namespace Tasks
 
         private void SetDone(Id id, bool done)
         {
-            var identifiedTask = projects
-                .SelectMany(project => project.Tasks)
-                .FirstOrDefault(task => task.Id == id);
+            var identifiedTask = projects.GetTaskById(id);
             if (identifiedTask == null)
             {
                 console.WriteLine("Could not find a task with an ID of {0}.", id);
@@ -111,10 +107,10 @@ namespace Tasks
     public class UncheckCommand : ICommand
     {
         private readonly CheckCommandLine commandLine;
-        private readonly List<Project> projects;
+        private readonly Projects projects;
         private readonly IConsole console;
 
-        public UncheckCommand(CheckCommandLine commandLine, List<Project> projects, IConsole console)
+        public UncheckCommand(CheckCommandLine commandLine, Projects projects, IConsole console)
         {
             this.commandLine = commandLine;
             this.projects = projects;
@@ -128,9 +124,7 @@ namespace Tasks
 
         private void SetDone(Id id, bool done)
         {
-            var identifiedTask = projects
-                .SelectMany(project => project.Tasks)
-                .FirstOrDefault(task => task.Id == id);
+            var identifiedTask = projects.GetTaskById(id);
             if (identifiedTask == null)
             {
                 console.WriteLine("Could not find a task with an ID of {0}.", id);
@@ -189,9 +183,9 @@ namespace Tasks
     public class DeadlineCommand : ICommand
     {
         private readonly DeadlineCommandLine commandLine;
-        private readonly List<Project> projects;
+        private readonly Projects projects;
 
-        public DeadlineCommand(DeadlineCommandLine commandLine, List<Project> projects)
+        public DeadlineCommand(DeadlineCommandLine commandLine, Projects projects)
         {
             this.commandLine = commandLine;
             this.projects = projects;
@@ -199,7 +193,7 @@ namespace Tasks
 
         public void Execute()
         {
-            var task = projects.SelectMany(x => x.Tasks).FirstOrDefault(x => x.Id == commandLine.Id);
+            var task = projects.GetTaskById(commandLine.Id);
             if (task == null)
             {
                 Console.WriteLine("Could not find a task with the id \"{0}\".", commandLine.Id);
@@ -213,38 +207,30 @@ namespace Tasks
     public class TodayCommand : ICommand
     {
         private readonly IConsole console;
-        private readonly List<Project> projects;
-        private readonly DateTime today;
+        private readonly Projects projects;
 
-        public TodayCommand(IConsole console, List<Project> projects, DateTime today)
+        public TodayCommand(IConsole console, Projects projects)
         {
             this.console = console;
             this.projects = projects;
-            this.today = today;
         }
 
         public void Execute()
         {
-            projects
-                .SelectMany(x => x.Tasks)
-                .Where(x => x.Deadline == today)
-                .ToList()
-                .ForEach(x => console.WriteLine(x.Description));
+            projects.GetTasksDueToday().ForEach(x => console.WriteLine(x.Description));
             console.WriteLine();
         }
     }
 
     public class CommandFactory
     {
-        private readonly List<Project> projects;
+        private readonly Projects projects;
         private readonly IConsole console;
-        private readonly DateTime today;
 
-        public CommandFactory(List<Project> projects, IConsole console, DateTime today)
+        public CommandFactory(Projects projects, IConsole console)
         {
             this.projects = projects;
             this.console = console;
-            this.today = today;
         }
 
         public ICommand Create(string arg)
@@ -280,7 +266,7 @@ namespace Tasks
             }
             else if (arg.StartsWith("today"))
             {
-                result = new TodayCommand(console, projects, today);
+                result = new TodayCommand(console, projects);
             }
             else if (arg.StartsWith("quit"))
             {
