@@ -3,18 +3,18 @@ namespace Tasks
     public class Id
     {
         private static long lastId;
-        private long _value;
+        private string _value;
 
         public Id(string value)
         {
-            _value = long.Parse(value);
+            _value = value;
         }
 
-        public static long GetNextId()
+        public static string GetNextId()
         {
-            return ++lastId;
+            return (++lastId).ToString();
         }
 
-        public static implicit operator long(Id id) => id._value;
+        public static implicit operator string(Id id) => id._value;
     }
 }
