@@ -7,6 +7,10 @@ namespace Tasks
 
         public Id(string value)
         {
+            if (value.Contains(' '))
+            {
+                throw new System.Exception("no spaces");
+            }
             _value = value;
         }
 
