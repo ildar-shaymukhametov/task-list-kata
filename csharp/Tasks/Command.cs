@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace Tasks
 {
@@ -29,6 +30,36 @@ namespace Tasks
                 }
                 console.WriteLine();
             }
+        }
+    }
+
+    public class ViewByDeadlineCommand : ICommand
+    {
+        private readonly IConsole console;
+        private readonly Projects projects;
+
+        public ViewByDeadlineCommand(IConsole console, Projects projects)
+        {
+            this.console = console;
+            this.projects = projects;
+        }
+
+        public void Execute()
+        {
+            projects
+                .SelectMany(x => x.Tasks)
+                .Where(x => x.Deadline != null)
+                .GroupBy(x => x.Deadline)
+                .ToList()
+                .ForEach(group =>
+                {
+                    console.WriteLine(group.Key?.ToString("dd.MM.yyyy"));
+                    foreach (var task in group)
+                    {
+                        console.WriteLine("    [{0}] {1}: {2}", (task.Done ? 'x' : ' '), task.Id, task.Description);
+                    }
+                    console.WriteLine();
+                });
         }
     }
 
@@ -274,6 +305,10 @@ namespace Tasks
             if (arg.StartsWith("show"))
             {
                 result = new ShowCommand(console, projects);
+            }
+            else if (arg.StartsWith("view by deadline"))
+            {
+                result = new ViewByDeadlineCommand(console, projects);
             }
             else if (arg.StartsWith("add task"))
             {

@@ -106,6 +106,17 @@ namespace Tasks
                 ""
             );
 
+			Execute("view by deadline");
+			ReadLines(
+                "10.10.2020",
+                "    [x] 1: Eat more donuts.",
+                "    [ ] 2: Destroy all humans.",
+                "",
+                "10.11.2020",
+                "    [x] 3: Four Elements of Simple Design",
+                ""
+			);
+
 			Execute("quit");
 		}
 
