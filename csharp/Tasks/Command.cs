@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Tasks
@@ -12,24 +13,21 @@ namespace Tasks
     {
         private readonly IConsole console;
         private readonly Projects projects;
+        private readonly IPrinter printer;
 
-        public ShowCommand(IConsole console, Projects projects)
+        public ShowCommand(IConsole console, Projects projects, IPrinter printer)
         {
             this.console = console;
             this.projects = projects;
+            this.printer = printer;
         }
 
         public void Execute()
         {
-            foreach (var project in projects)
-            {
-                console.WriteLine(project.Name);
-                foreach (var task in project.Tasks)
-                {
-                    console.WriteLine("    [{0}] {1}: {2}", (task.Done ? 'x' : ' '), task.Id, task.Description);
-                }
-                console.WriteLine();
-            }
+            var data = projects
+                .Select(x => new KeyValuePair<string, Task[]>(x.Name, x.Tasks.ToArray()))
+                .ToArray();
+            printer.Print(data);
         }
     }
 
@@ -37,29 +35,24 @@ namespace Tasks
     {
         private readonly IConsole console;
         private readonly Projects projects;
+        private readonly IPrinter printer;
 
-        public ViewByDeadlineCommand(IConsole console, Projects projects)
+        public ViewByDeadlineCommand(IConsole console, Projects projects, IPrinter printer)
         {
             this.console = console;
             this.projects = projects;
+            this.printer = printer;
         }
 
         public void Execute()
         {
-            projects
+            var data = projects
                 .SelectMany(x => x.Tasks)
                 .Where(x => x.Deadline != null)
                 .GroupBy(x => x.Deadline)
-                .ToList()
-                .ForEach(group =>
-                {
-                    console.WriteLine(group.Key?.ToString("dd.MM.yyyy"));
-                    foreach (var task in group)
-                    {
-                        console.WriteLine("    [{0}] {1}: {2}", (task.Done ? 'x' : ' '), task.Id, task.Description);
-                    }
-                    console.WriteLine();
-                });
+                .Select(x => new KeyValuePair<string, Task[]>(x.Key?.ToString("dd.MM.yyyy"), x.ToArray()))
+                .ToArray();
+            printer.Print(data);
         }
     }
 
@@ -304,11 +297,11 @@ namespace Tasks
             ICommand result = null;
             if (arg.StartsWith("show"))
             {
-                result = new ShowCommand(console, projects);
+                result = new ShowCommand(console, projects, new Printer(console));
             }
             else if (arg.StartsWith("view by deadline"))
             {
-                result = new ViewByDeadlineCommand(console, projects);
+                result = new ViewByDeadlineCommand(console, projects, new Printer(console));
             }
             else if (arg.StartsWith("add task"))
             {
