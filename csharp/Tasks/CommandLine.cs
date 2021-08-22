@@ -77,4 +77,16 @@ namespace Tasks
             NewId = new Id(args[2]);
         }
     }
+    
+    public class DeleteCommandLine : CommandLine
+    {
+        public Id Id { get; }
+        public Id NewId { get; }
+
+        public DeleteCommandLine(string arg) : base(arg)
+        {
+            var args = arg.Split(" ");
+            Id = new Id(args[1]);
+        }
+    }
 }

@@ -240,6 +240,23 @@ namespace Tasks
         }
     }
 
+    public class DeleteCommand : ICommand
+    {
+        private readonly DeleteCommandLine commandLine;
+        private readonly Projects projects;
+
+        public DeleteCommand(DeleteCommandLine commandLine, Projects projects)
+        {
+            this.commandLine = commandLine;
+            this.projects = projects;
+        }
+
+        public void Execute()
+        {
+            projects.DeleteTaskById(commandLine.Id);
+        }
+    }
+
     public class CommandFactory
     {
         private readonly Projects projects;
@@ -289,6 +306,10 @@ namespace Tasks
             else if (arg.StartsWith("id"))
             {
                 result = new IdCommand(new IdCommandLine(arg), projects);
+            }
+            else if (arg.StartsWith("delete"))
+            {
+                result = new DeleteCommand(new DeleteCommandLine(arg), projects);
             }
             else if (arg.StartsWith("quit"))
             {

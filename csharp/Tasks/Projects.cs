@@ -51,5 +51,11 @@ namespace Tasks
         {
             return GetEnumerator();
         }
+
+        public void DeleteTaskById(Id id)
+        {
+            var task = GetTaskById(id);
+            _projects.ForEach(p => p.Tasks.Remove(task));
+        }
     }
 }

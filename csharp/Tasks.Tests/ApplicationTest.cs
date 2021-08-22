@@ -76,6 +76,9 @@ namespace Tasks
 			Execute("add task training Foobar");
             Execute("id 9 foo");
 
+			Execute("add task training Foobar2");
+			Execute("delete 10");
+
 			Execute("show");
 			ReadLines(
 				"secrets",
