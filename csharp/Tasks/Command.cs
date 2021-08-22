@@ -75,11 +75,11 @@ namespace Tasks
 
     public class CheckCommand : ICommand
     {
-        private readonly CheckCommandLine commandLine;
+        private readonly IdCommandLine commandLine;
         private readonly Projects projects;
         private readonly IConsole console;
 
-        public CheckCommand(CheckCommandLine commandLine, Projects projects, IConsole console)
+        public CheckCommand(IdCommandLine commandLine, Projects projects, IConsole console)
         {
             this.commandLine = commandLine;
             this.projects = projects;
@@ -106,11 +106,11 @@ namespace Tasks
 
     public class UncheckCommand : ICommand
     {
-        private readonly CheckCommandLine commandLine;
+        private readonly IdCommandLine commandLine;
         private readonly Projects projects;
         private readonly IConsole console;
 
-        public UncheckCommand(CheckCommandLine commandLine, Projects projects, IConsole console)
+        public UncheckCommand(IdCommandLine commandLine, Projects projects, IConsole console)
         {
             this.commandLine = commandLine;
             this.projects = projects;
@@ -224,10 +224,10 @@ namespace Tasks
 
     public class IdCommand : ICommand
     {
-        private readonly IdCommandLine commandLine;
+        private readonly IdsCommandLine commandLine;
         private readonly Projects projects;
 
-        public IdCommand(IdCommandLine commandLine, Projects projects)
+        public IdCommand(IdsCommandLine commandLine, Projects projects)
         {
             this.commandLine = commandLine;
             this.projects = projects;
@@ -242,10 +242,10 @@ namespace Tasks
 
     public class DeleteCommand : ICommand
     {
-        private readonly DeleteCommandLine commandLine;
+        private readonly IdCommandLine commandLine;
         private readonly Projects projects;
 
-        public DeleteCommand(DeleteCommandLine commandLine, Projects projects)
+        public DeleteCommand(IdCommandLine commandLine, Projects projects)
         {
             this.commandLine = commandLine;
             this.projects = projects;
@@ -285,11 +285,11 @@ namespace Tasks
             }
             else if (arg.StartsWith("check"))
             {
-                result = new CheckCommand(new CheckCommandLine(arg), projects, console);
+                result = new CheckCommand(new IdCommandLine(arg), projects, console);
             }
             else if (arg.StartsWith("uncheck"))
             {
-                result = new UncheckCommand(new CheckCommandLine(arg), projects, console);
+                result = new UncheckCommand(new IdCommandLine(arg), projects, console);
             }
             else if (arg.StartsWith("help"))
             {
@@ -305,11 +305,11 @@ namespace Tasks
             }
             else if (arg.StartsWith("id"))
             {
-                result = new IdCommand(new IdCommandLine(arg), projects);
+                result = new IdCommand(new IdsCommandLine(arg), projects);
             }
             else if (arg.StartsWith("delete"))
             {
-                result = new DeleteCommand(new DeleteCommandLine(arg), projects);
+                result = new DeleteCommand(new IdCommandLine(arg), projects);
             }
             else if (arg.StartsWith("quit"))
             {

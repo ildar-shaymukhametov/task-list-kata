@@ -41,11 +41,11 @@ namespace Tasks
         }
     }
 
-    public class CheckCommandLine : CommandLine
+    public class IdCommandLine : CommandLine
     {
         public Id Id { get; }
 
-        public CheckCommandLine(string arg) : base(arg)
+        public IdCommandLine(string arg) : base(arg)
         {
             var args = arg.Split(" ", 2);
             Id = new Id(args[1]);
@@ -65,28 +65,16 @@ namespace Tasks
         }
     }
 
-    public class IdCommandLine : CommandLine
+    public class IdsCommandLine : CommandLine
     {
         public Id OldId { get; }
         public Id NewId { get; }
 
-        public IdCommandLine(string arg) : base(arg)
+        public IdsCommandLine(string arg) : base(arg)
         {
             var args = arg.Split(" ");
             OldId = new Id(args[1]);
             NewId = new Id(args[2]);
-        }
-    }
-    
-    public class DeleteCommandLine : CommandLine
-    {
-        public Id Id { get; }
-        public Id NewId { get; }
-
-        public DeleteCommandLine(string arg) : base(arg)
-        {
-            var args = arg.Split(" ");
-            Id = new Id(args[1]);
         }
     }
 }
