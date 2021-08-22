@@ -222,6 +222,24 @@ namespace Tasks
         }
     }
 
+    public class IdCommand : ICommand
+    {
+        private readonly IdCommandLine commandLine;
+        private readonly Projects projects;
+
+        public IdCommand(IdCommandLine commandLine, Projects projects)
+        {
+            this.commandLine = commandLine;
+            this.projects = projects;
+        }
+
+        public void Execute()
+        {
+            var task = projects.GetTaskById(commandLine.OldId);
+            task.Id = commandLine.NewId;
+        }
+    }
+
     public class CommandFactory
     {
         private readonly Projects projects;
@@ -267,6 +285,10 @@ namespace Tasks
             else if (arg.StartsWith("today"))
             {
                 result = new TodayCommand(console, projects);
+            }
+            else if (arg.StartsWith("id"))
+            {
+                result = new IdCommand(new IdCommandLine(arg), projects);
             }
             else if (arg.StartsWith("quit"))
             {

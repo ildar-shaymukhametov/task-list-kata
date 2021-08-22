@@ -73,6 +73,9 @@ namespace Tasks
 			Execute("check 5");
 			Execute("check 6");
 
+			Execute("add task training Foobar");
+            Execute("id 9 foo");
+
 			Execute("show");
 			ReadLines(
 				"secrets",
@@ -86,6 +89,7 @@ namespace Tasks
 				"    [x] 6: Primitive Obsession",
 				"    [ ] 7: Outside-In TDD",
 				"    [ ] 8: Interaction-Driven Design",
+				"    [ ] foo: Foobar",
 				""
 			);
 
