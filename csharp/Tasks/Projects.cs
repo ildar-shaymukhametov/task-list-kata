@@ -26,10 +26,10 @@ namespace Tasks
 
         public Task GetTaskById(Id id)
         {
-            return GetTasks().FirstOrDefault(task => task.Id == id);
+            return GetAllTasks().FirstOrDefault(task => task.Id == id);
         }
 
-        public List<Task> GetTasks()
+        public List<Task> GetAllTasks()
         {
             return _projects.SelectMany(x => x.Tasks).ToList();
         }

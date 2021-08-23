@@ -46,7 +46,7 @@ namespace Tasks
 
         public void Execute()
         {
-            var data = projects.GetTasks()
+            var data = projects.GetAllTasks()
                 .Where(x => x.Deadline != null)
                 .GroupBy(x => x.Deadline)
                 .Select(x => new KeyValuePair<string, Task[]>(x.Key?.ToString("dd.MM.yyyy"), x.ToArray()))
@@ -242,7 +242,7 @@ namespace Tasks
 
         public void Execute()
         {
-            projects.GetTasks()
+            projects.GetAllTasks()
                 .Where(x => x.Deadline == today)
                 .ToList()
                 .ForEach(x => console.WriteLine(x.Description));
