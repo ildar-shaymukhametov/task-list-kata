@@ -4,7 +4,7 @@ namespace Tasks
 {
     public interface IPrinter
     {
-        void Print(KeyValuePair<string, Task[]>[] data);
+        void Print(Dictionary<string, Task[]> data);
     }
 
     public class Printer : IPrinter
@@ -16,7 +16,7 @@ namespace Tasks
             this.console = console;
         }
 
-        public void Print(KeyValuePair<string, Task[]>[] data)
+        public void Print(Dictionary<string, Task[]> data)
         {
             foreach (var group in data)
             {

@@ -24,9 +24,7 @@ namespace Tasks
 
         public void Execute()
         {
-            var data = projects
-                .Select(x => new KeyValuePair<string, Task[]>(x.Name, x.Tasks.ToArray()))
-                .ToArray();
+            var data = projects.ToDictionary(x => x.Name, x => x.Tasks.ToArray());
             printer.Print(data);
         }
     }
@@ -49,8 +47,7 @@ namespace Tasks
             var data = projects.GetAllTasks()
                 .Where(x => x.Deadline != null)
                 .GroupBy(x => x.Deadline)
-                .Select(x => new KeyValuePair<string, Task[]>(x.Key?.ToString("dd.MM.yyyy"), x.ToArray()))
-                .ToArray();
+                .ToDictionary(x => x.Key?.ToString("dd.MM.yyyy"), x => x.ToArray());
             printer.Print(data);
         }
     }
