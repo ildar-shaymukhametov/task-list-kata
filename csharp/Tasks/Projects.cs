@@ -8,12 +8,10 @@ namespace Tasks
     public class Projects : IEnumerable<Project>
     {
         private readonly List<Project> _projects;
-        private readonly DateTime today;
 
-        public Projects(DateTime today)
+        public Projects()
         {
             _projects = new List<Project>();
-            this.today = today;
         }
 
         public void Add(Project project)
@@ -31,12 +29,9 @@ namespace Tasks
             return _projects.SelectMany(project => project.Tasks).FirstOrDefault(task => task.Id == id);
         }
 
-        public List<Task> GetTasksDueToday()
+        public List<Task> GetTasks()
         {
-            return _projects
-                .SelectMany(x => x.Tasks)
-                .Where(x => x.Deadline == today)
-                .ToList();
+            return _projects.SelectMany(x => x.Tasks).ToList();
         }
 
         public IEnumerator<Project> GetEnumerator()

@@ -232,16 +232,21 @@ namespace Tasks
     {
         private readonly IConsole console;
         private readonly Projects projects;
+        private readonly DateTime today;
 
-        public TodayCommand(IConsole console, Projects projects)
+        public TodayCommand(IConsole console, Projects projects, DateTime today)
         {
             this.console = console;
             this.projects = projects;
+            this.today = today;
         }
 
         public void Execute()
         {
-            projects.GetTasksDueToday().ForEach(x => console.WriteLine(x.Description));
+            projects.GetTasks()
+                .Where(x => x.Deadline == today)
+                .ToList()
+                .ForEach(x => console.WriteLine(x.Description));
             console.WriteLine();
         }
     }
@@ -285,11 +290,13 @@ namespace Tasks
     {
         private readonly Projects projects;
         private readonly IConsole console;
+        private readonly DateTime today;
 
-        public CommandFactory(Projects projects, IConsole console)
+        public CommandFactory(Projects projects, IConsole console, DateTime today)
         {
             this.projects = projects;
             this.console = console;
+            this.today = today;
         }
 
         public ICommand Create(string arg)
@@ -329,7 +336,7 @@ namespace Tasks
             }
             else if (arg.StartsWith("today"))
             {
-                result = new TodayCommand(console, projects);
+                result = new TodayCommand(console, projects, today);
             }
             else if (arg.StartsWith("id"))
             {

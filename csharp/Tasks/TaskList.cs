@@ -18,8 +18,8 @@ namespace Tasks
         public TaskList(IConsole console, DateTime today)
         {
             this.console = console;
-            this.projects = new Projects(today);
-            this.factory = new CommandFactory(projects, console);
+            this.projects = new Projects();
+            this.factory = new CommandFactory(projects, console, today);
         }
 
         public void Run()
