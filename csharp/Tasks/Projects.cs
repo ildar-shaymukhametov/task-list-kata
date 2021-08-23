@@ -26,7 +26,7 @@ namespace Tasks
 
         public Task GetTaskById(Id id)
         {
-            return _projects.SelectMany(project => project.Tasks).FirstOrDefault(task => task.Id == id);
+            return GetTasks().FirstOrDefault(task => task.Id == id);
         }
 
         public List<Task> GetTasks()

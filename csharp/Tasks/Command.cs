@@ -46,8 +46,7 @@ namespace Tasks
 
         public void Execute()
         {
-            var data = projects
-                .SelectMany(x => x.Tasks)
+            var data = projects.GetTasks()
                 .Where(x => x.Deadline != null)
                 .GroupBy(x => x.Deadline)
                 .Select(x => new KeyValuePair<string, Task[]>(x.Key?.ToString("dd.MM.yyyy"), x.ToArray()))
