@@ -9,13 +9,13 @@ namespace Tasks
         void Execute();
     }
 
-    public class ShowCommand : ICommand
+    public class ViewByProjectCommand : ICommand
     {
         private readonly IConsole console;
         private readonly Projects projects;
         private readonly IPrinter printer;
 
-        public ShowCommand(IConsole console, Projects projects, IPrinter printer)
+        public ViewByProjectCommand(IConsole console, Projects projects, IPrinter printer)
         {
             this.console = console;
             this.projects = projects;
@@ -295,9 +295,9 @@ namespace Tasks
         public ICommand Create(string arg)
         {
             ICommand result = null;
-            if (arg.StartsWith("show"))
+            if (arg.StartsWith("view by project"))
             {
-                result = new ShowCommand(console, projects, new Printer(console));
+                result = new ViewByProjectCommand(console, projects, new Printer(console));
             }
             else if (arg.StartsWith("view by deadline"))
             {

@@ -36,14 +36,14 @@ namespace Tasks
 		[Test, Timeout(1000)]
 		public void ItWorks()
 		{
-			Execute("show");
+			Execute("view by project");
 
 			Execute("add project secrets");
 			Execute("add task secrets Eat more donuts.");
 			Execute("add task secrets Destroy all humans.");
 
             Execute("check 1");
-			Execute("show");
+			Execute("view by project");
 			ReadLines(
 				"secrets",
 				"    [x] 1: Eat more donuts.",
@@ -52,7 +52,7 @@ namespace Tasks
 			);
 
             Execute("uncheck 1");
-            Execute("show");
+            Execute("view by project");
             ReadLines(
                 "secrets",
                 "    [ ] 1: Eat more donuts.",
@@ -79,7 +79,7 @@ namespace Tasks
 			Execute("add task training Foobar2");
 			Execute("delete 10");
 
-			Execute("show");
+			Execute("view by project");
 			ReadLines(
 				"secrets",
 				"    [x] 1: Eat more donuts.",
