@@ -24,8 +24,7 @@ namespace Tasks
 
         public void Execute()
         {
-            var data = projects.ToDictionary(x => x.Name, x => x.Tasks.ToArray());
-            printer.Print(data);
+            printer.Print(projects.ToDictionary());
         }
     }
 

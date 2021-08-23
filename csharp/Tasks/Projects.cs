@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Tasks
 {
-    public class Projects : IEnumerable<Project>
+    public class Projects
     {
         private readonly List<Project> _projects;
 
@@ -29,22 +29,14 @@ namespace Tasks
             return GetAllTasks().FirstOrDefault(task => task.Id == id);
         }
 
+        public Dictionary<string, Task[]> ToDictionary()
+        {
+            return _projects.ToDictionary(x => x.Name, x => x.Tasks.ToArray());
+        }
+
         public List<Task> GetAllTasks()
         {
             return _projects.SelectMany(x => x.Tasks).ToList();
-        }
-
-        public IEnumerator<Project> GetEnumerator()
-        {
-            foreach (var item in _projects)
-            {
-                yield return item;
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
         }
 
         public void DeleteTaskById(Id id)
