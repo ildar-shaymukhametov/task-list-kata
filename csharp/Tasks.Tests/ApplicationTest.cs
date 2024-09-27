@@ -16,7 +16,7 @@ namespace Tasks
 		public void StartTheApplication()
 		{
 			this.console = new FakeConsole();
-			var taskList = new TaskList(console);
+			var taskList = new TaskList(console, new DateTime(2020, 10, 10));
 			this.applicationThread = new System.Threading.Thread(() => taskList.Run());
 			applicationThread.Start();
 		}
@@ -36,21 +36,31 @@ namespace Tasks
 		[Test, Timeout(1000)]
 		public void ItWorks()
 		{
-			Execute("show");
+			Execute("view by project");
 
 			Execute("add project secrets");
 			Execute("add task secrets Eat more donuts.");
 			Execute("add task secrets Destroy all humans.");
 
-			Execute("show");
+            Execute("check 1");
+			Execute("view by project");
 			ReadLines(
 				"secrets",
-				"    [ ] 1: Eat more donuts.",
+				"    [x] 1: Eat more donuts.",
 				"    [ ] 2: Destroy all humans.",
 				""
 			);
 
-			Execute("add project training");
+            Execute("uncheck 1");
+            Execute("view by project");
+            ReadLines(
+                "secrets",
+                "    [ ] 1: Eat more donuts.",
+                "    [ ] 2: Destroy all humans.",
+                ""
+            );
+
+            Execute("add project training");
 			Execute("add task training Four Elements of Simple Design");
 			Execute("add task training SOLID");
 			Execute("add task training Coupling and Cohesion");
@@ -63,7 +73,13 @@ namespace Tasks
 			Execute("check 5");
 			Execute("check 6");
 
-			Execute("show");
+			Execute("add task training Foobar");
+            Execute("id 9 foo");
+
+			Execute("add task training Foobar2");
+			Execute("delete 10");
+
+			Execute("view by project");
 			ReadLines(
 				"secrets",
 				"    [x] 1: Eat more donuts.",
@@ -76,7 +92,29 @@ namespace Tasks
 				"    [x] 6: Primitive Obsession",
 				"    [ ] 7: Outside-In TDD",
 				"    [ ] 8: Interaction-Driven Design",
+				"    [ ] foo: Foobar",
 				""
+			);
+
+            Execute("deadline 1 10.10.2020");
+            Execute("deadline 2 10.10.2020");
+            Execute("deadline 3 11.10.2020");
+            Execute("today");
+            ReadLines(
+                "Eat more donuts.",
+                "Destroy all humans.",
+                ""
+            );
+
+			Execute("view by deadline");
+			ReadLines(
+                "10.10.2020",
+                "    [x] 1: Eat more donuts.",
+                "    [ ] 2: Destroy all humans.",
+                "",
+                "10.11.2020",
+                "    [x] 3: Four Elements of Simple Design",
+                ""
 			);
 
 			Execute("quit");
